@@ -9,6 +9,8 @@
 
 #include "smartqq.h"
 
+#include "json.hpp"
+
 NAMESPACE_BEGIN(smartqq)
 
 using namespace std;
@@ -39,12 +41,12 @@ struct DiscussUser {
     int clientType;
     string status;
 
-    string toString() {
+    string toString() const {
         string ret = "DiscussUser{";
         return ret.append("uin=").append(to_string(uin))
-            .append(", nick='").append(nick).append("\'")
-            .append(", cliendType='").append(to_string(clientType)).append("\'")
-            .append(", status='").append(status).append("\'")
+            .append(", nick='").append(nick).append("'")
+            .append(", cliendType='").append(to_string(clientType)).append("'")
+            .append(", status='").append(status).append("'")
             .append("}");
     }
 };
@@ -81,6 +83,17 @@ struct Font {
         font.size = 10;
         return font;
     }
+
+    string toString() const {
+        nlohmann::json _j;
+        nlohmann::json j;
+        j["style"] = {style[0], style[1], style[2]};
+        j["color"] = color;
+        j["name"] = name;
+        j["size"] = size;
+        _j["Font"] = j;
+        return _j.dump();
+    }
 };
 
 const Font Font::DEFAULT_FONT = defaultFont();
@@ -92,7 +105,7 @@ struct Friend {
     bool vip;
     int vipLevel;
 
-    string toString() {
+    string toString() const {
         string ret;
         stringstream ss;
         ss << "Friend{" << "userId=" << userId << ", markname='" << markname
