@@ -1,4 +1,4 @@
 [submodule "cpr"]
 	path = cpr
-	url = https://github.com/whoshuu/cpr.git
-	branch = master
+	url = https://github.com/ArkBriar/cpr.git
+	branch = modified
