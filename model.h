@@ -43,7 +43,6 @@ struct Category {
         index = json["index"];
         sort = json["sort"];
         name = json["name"];
-        friends = json["friends"].get<list<Friend>>();
     }
 
     static Category defaultCategory() {
@@ -161,13 +160,11 @@ struct DiscussMessage {
         time = json["time"].get<int64_t>();
         did = json["did"].get<int64_t>();
         uid = json["send_uin"].get<int64_t>();
-        auto _content = json["content"].get<list<nlohmann::json::basic_json>>();
+        auto _content = json["content"].get<vector<nlohmann::json>>();
         font = Font(_content.front());
         content = _content.back().get<string>();
     }
 };
-
-const Font Font::DEFAULT_FONT = defaultFont();
 
 struct Friend {
     int64_t userId;
@@ -281,7 +278,7 @@ struct GroupMessage {
         time = json["time"].get<int64_t>();
         gid = json["group_code"].get<int64_t>();
         uid = json["send_uin"].get<int64_t>();
-        auto _content = json["content"].get<list<nlohmann::json::basic_json>>();
+        auto _content = json["content"].get<list<nlohmann::json>>();
         font = Font(_content.front());
         content = _content.back().get<string>();
     }
@@ -297,7 +294,7 @@ struct Message {
     Message(nlohmann::json json) {
         time = json["time"].get<int64_t>();
         uid = json["from_uin"].get<int64_t>();
-        auto _content = json["content"].get<list<nlohmann::json::basic_json>>();
+        auto _content = json["content"].get<list<nlohmann::json>>();
         font = Font(_content.front());
         content = _content.back().get<string>();
     }
@@ -324,7 +321,7 @@ struct UserInfo {
     string uin;
     int blood;
     string lnick;
-    string homoepage;
+    string homepage;
     int vipInfo;
     string city;
     string country;

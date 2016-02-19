@@ -39,8 +39,6 @@ private:
     std::string referer;
 };
 
-const std::string ApiUrl::USER_AGENT = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
-
 extern const ApiUrl
 __GET_QR_CODE,
 __VERIFY_QR_CODE,

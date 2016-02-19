@@ -1,14 +1,19 @@
 #include "client.h"
 
 #include <iostream>
+#include <fstream>
 using namespace smartqq;
 
+int64_t SmartQQClient::MESSAGE_ID = 32690001L;
+const int64_t SmartQQClient::Client_ID = 53999199L;
+
 #ifdef SMARTQQ_DEBUG
-#define log(str) std::cout << str << std::endl
+#define log_debug(str) std::cerr << str << std::endl
 #else
-#define log(str)
+#define log_debug(str)
 #endif
 
+#define log(str) std::cout << str << std::endl
 #define log_err(str) std::cerr << str << std::endl;
 
 using json = nlohmann::json;
@@ -17,7 +22,7 @@ SmartQQClient::SmartQQClient(MessageCallback& callback)
 {
     login();
 
-    pollMessage(callback);
+//    pollMessage(callback);
 }
 
 void SmartQQClient::login()
@@ -32,10 +37,13 @@ void SmartQQClient::login()
 void SmartQQClient::getQRCode()
 {
     log("Getting QRCode.");
-
-    /*
-     *get(SMARTQQ_API_URL(GET_QR_CODE));
-     */
+    auto r = get(SMARTQQ_API_URL(GET_QR_CODE));
+    session.SetCookies(r.cookies);
+    fstream out("QR.png", ios::out);
+    log_debug(r.error.message);
+    log_debug(r.text);
+    out << r.text;
+    out.close();
     cout << "QR Code is on site below, please open in the browser.\n" <<
         SMARTQQ_API_URL(GET_QR_CODE).getUrl() << std::endl;
 }
@@ -48,6 +56,10 @@ string SmartQQClient::verifyQRCode()
         sleep(1);
         auto r = get(SMARTQQ_API_URL(VERIFY_QR_CODE));
         string result = r.text;
+        if (r.status_code != 0) {
+            log_debug(string("Http return ").append(to_string(r.status_code))
+                    .append(".\n").append(r.text));
+        }
         if (result.find("成功") != string::npos) {
             for (string::size_type i = 0, j = 0; i != string::npos; i = j + 3) {
                 j = result.find("','", i);
@@ -235,7 +247,7 @@ list<Category> SmartQQClient::getFriendListWithCategory()
     /*@Parse JSON result into list
      * */
     map<int64_t, Friend> friendMap = parseFriendMap(jres);
-    auto _categs = jres["categories"].get<list<json::basic_json>>();
+    auto _categs = jres["categories"].get<list<json>>();
     map<int64_t, Category> categoryMap;
     categoryMap.insert({0, Category::defaultCategory()});
     for (auto i : _categs) {
@@ -312,7 +324,7 @@ list<Recent> SmartQQClient::getRecentList()
     /*@Parse JSON result into list
      * */
 
-    auto _recs = jres.get<list<json::basic_json>>();
+    auto _recs = jres.get<list<json>>();
     for (auto i : _recs) {
         recents.push_back(i);
     }
@@ -338,7 +350,7 @@ list<FriendStatus> SmartQQClient::getFriendStatus()
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into list
      * */
-    auto _frdstss = jres.get<list<json::basic_json>>();
+    auto _frdstss = jres.get<list<json>>();
 
     for (auto i : _frdstss) {
         fses.push_back(i);
@@ -452,7 +464,10 @@ map<int64_t, Friend> SmartQQClient::parseFriendMap(json result)
 
 cpr::Response SmartQQClient::get(const ApiUrl& url)
 {
-    return get(url, map<string, string>());
+    session.SetUrl(url.getUrl());
+    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
+
+    return session.Get();
 }
 
 cpr::Response SmartQQClient::get(const ApiUrl& url, const list<string>& params)
@@ -542,7 +557,7 @@ string SmartQQClient::hash(int64_t x, string K)
 
 void SmartQQClient::sleep(int64_t seconds)
 {
-
+    std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
 
 void SmartQQClient::close()
@@ -580,5 +595,5 @@ json::array_t SmartQQClient::getJsonArrayResult(const cpr::Response& r)
 
 json SmartQQClient::getJsonObjectResult(const cpr::Response& r)
 {
-    return getResponseJson(r)["result"].get<json>();
+    return getResponseJson(r)["result"];
 }

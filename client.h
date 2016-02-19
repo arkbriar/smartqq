@@ -105,9 +105,6 @@ private:
     static nlohmann::json getJsonObjectResult(const cpr::Response& r);
 };
 
-int64_t SmartQQClient::MESSAGE_ID = 32690001L;
-const int64_t SmartQQClient::Client_ID = 53999199L;
-
 NAMESPACE_END(smartqq)
 
 #endif
