@@ -38,14 +38,12 @@ void SmartQQClient::getQRCode()
 {
     log("Getting QRCode.");
     auto r = get(SMARTQQ_API_URL(GET_QR_CODE));
-    session.SetCookies(r.cookies);
+    cookies = r.cookies;
+    log_debug(cookies["qrsig"]);
     fstream out("QR.png", ios::out);
-    log_debug(r.error.message);
-    log_debug(r.text);
     out << r.text;
     out.close();
-    cout << "QR Code is on site below, please open in the browser.\n" <<
-        SMARTQQ_API_URL(GET_QR_CODE).getUrl() << std::endl;
+    cout << "QR Code is in file QR.png. Please open and scan.\n";
 }
 
 string SmartQQClient::verifyQRCode()
@@ -56,15 +54,15 @@ string SmartQQClient::verifyQRCode()
         sleep(1);
         auto r = get(SMARTQQ_API_URL(VERIFY_QR_CODE));
         string result = r.text;
-        if (r.status_code != 0) {
-            log_debug(string("Http return ").append(to_string(r.status_code))
-                    .append(".\n").append(r.text));
+        if (r.status_code != 200) {
+            log_debug(string("Http return ").append(to_string(r.status_code)));
         }
         if (result.find("成功") != string::npos) {
+            log_debug(r.text);
             for (string::size_type i = 0, j = 0; i != string::npos; i = j + 3) {
                 j = result.find("','", i);
-                string content = result.substr(i, j);
-                if(content.find_first_of("http") == 0)
+                string content = result.substr(i, j - i);
+                if(content.substr(0, 4) == "http")
                     return content;
             }
         } else if (result.find("已失效") != string::npos)  {
@@ -93,6 +91,7 @@ void SmartQQClient::getVfwebqq()
 
     list<string> params;
     params.push_back(ptwebqq);
+    log_debug(ptwebqq);
     auto r = get(SMARTQQ_API_URL(GET_PTWEBQQ), params);
 
     /* Get vfwebqq */
@@ -466,6 +465,7 @@ cpr::Response SmartQQClient::get(const ApiUrl& url)
 {
     session.SetUrl(url.getUrl());
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
+    session.SetCookies(cookies);
 
     return session.Get();
 }
@@ -474,6 +474,7 @@ cpr::Response SmartQQClient::get(const ApiUrl& url, const list<string>& params)
 {
     session.SetUrl(url.buildUrl(params));
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
+    session.SetCookies(cookies);
 
     return session.Get();
 }
@@ -482,6 +483,7 @@ cpr::Response SmartQQClient::get(const ApiUrl& url, const map<string, string>& p
 {
     session.SetUrl(url.getUrl());
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
+    session.SetCookies(cookies);
     cpr::Parameters _cpr_params;
     for (auto pair : params) {
         _cpr_params.AddParameter({pair.first, pair.second});
@@ -500,6 +502,7 @@ cpr::Response SmartQQClient::post(const ApiUrl& url, const json& jparam)
 {
     session.SetUrl(url.getUrl());
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}, {"Origin", url.getOrigin()}});
+    session.SetCookies(cookies);
 
     cpr::Payload _cpr_form({{"r", jparam.dump()}});
     session.SetPayload(std::move(_cpr_form));

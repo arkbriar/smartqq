@@ -21,8 +21,6 @@ public:
     static int64_t MESSAGE_ID;
     static const int64_t Client_ID;
 
-    cpr::Session session;
-
     string ptwebqq;
     string vfwebqq;
     int64_t uin;
@@ -103,6 +101,10 @@ private:
     static nlohmann::json::array_t getJsonArrayResult(const cpr::Response& r);
 
     static nlohmann::json getJsonObjectResult(const cpr::Response& r);
+
+    cpr::Session session;
+
+    cpr::Cookies cookies;
 };
 
 NAMESPACE_END(smartqq)
