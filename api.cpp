@@ -15,7 +15,7 @@ __VERIFY_QR_CODE (
 ),
 __GET_PTWEBQQ (
     "{##}",
-    ""
+    "https://ui.ptlogin2.qq.com/cgi-bin/login"
 ),
 __GET_VFWEBQQ (
     "http://s.web2.qq.com/api/getvfwebqq?ptwebqq={##}&clientid=53999199&psessionid=&t=0.1",

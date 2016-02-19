@@ -58,7 +58,9 @@ string SmartQQClient::verifyQRCode()
             log_debug(string("Http return ").append(to_string(r.status_code)));
         }
         if (result.find("成功") != string::npos) {
+            log_debug(r.cookies.GetEncoded());
             log_debug(r.text);
+            cookies.AddCookie(r.cookies);
             for (string::size_type i = 0, j = 0; i != string::npos; i = j + 3) {
                 j = result.find("','", i);
                 string content = result.substr(i, j - i);
@@ -80,9 +82,12 @@ void SmartQQClient::getPtwebqq(const string& url)
     list<string> params;
     params.push_back(url);
     auto r = get(SMARTQQ_API_URL(GET_PTWEBQQ), params);
+    cookies.AddCookie(r.cookies);
 
+    log_debug(r.status_code);
+    log_debug(r.cookies.GetEncoded());
     /* Get ptwebqq from cookies */
-    ptwebqq = r.cookies["ptwebqq"];
+    ptwebqq = cookies["ptwebqq"];
 }
 
 void SmartQQClient::getVfwebqq()
@@ -91,11 +96,13 @@ void SmartQQClient::getVfwebqq()
 
     list<string> params;
     params.push_back(ptwebqq);
-    log_debug(ptwebqq);
-    auto r = get(SMARTQQ_API_URL(GET_PTWEBQQ), params);
+    auto r = get(SMARTQQ_API_URL(GET_VFWEBQQ), params);
+    cookies.AddCookie(r.cookies);
+    log_debug(r.status_code);
 
     /* Get vfwebqq */
     vfwebqq = getJsonObjectResult(r)["vfwebqq"];
+    log_debug(vfwebqq);
 }
 
 void SmartQQClient::getUinAndPsessionid()
@@ -463,6 +470,7 @@ map<int64_t, Friend> SmartQQClient::parseFriendMap(json result)
 
 cpr::Response SmartQQClient::get(const ApiUrl& url)
 {
+    log_debug(string("HTTP/GET ").append(url.getUrl()));
     session.SetUrl(url.getUrl());
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
     session.SetCookies(cookies);
@@ -472,6 +480,7 @@ cpr::Response SmartQQClient::get(const ApiUrl& url)
 
 cpr::Response SmartQQClient::get(const ApiUrl& url, const list<string>& params)
 {
+    log_debug(string("HTTP/GET ").append(url.buildUrl(params)));
     session.SetUrl(url.buildUrl(params));
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
     session.SetCookies(cookies);
@@ -481,6 +490,7 @@ cpr::Response SmartQQClient::get(const ApiUrl& url, const list<string>& params)
 
 cpr::Response SmartQQClient::get(const ApiUrl& url, const map<string, string>& params)
 {
+    log_debug(string("HTTP/GET ").append(url.getUrl()));
     session.SetUrl(url.getUrl());
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
     session.SetCookies(cookies);
@@ -500,6 +510,7 @@ cpr::Response SmartQQClient::post(const ApiUrl& url)
 
 cpr::Response SmartQQClient::post(const ApiUrl& url, const json& jparam)
 {
+    log_debug(string("HTTP/POST ").append(url.getUrl()));
     session.SetUrl(url.getUrl());
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}, {"Origin", url.getOrigin()}});
     session.SetCookies(cookies);
@@ -507,7 +518,7 @@ cpr::Response SmartQQClient::post(const ApiUrl& url, const json& jparam)
     cpr::Payload _cpr_form({{"r", jparam.dump()}});
     session.SetPayload(std::move(_cpr_form));
 
-    return session.Get();
+    return session.Post();
 }
 
 void SmartQQClient::checkSendMsgResult(cpr::Response r)
