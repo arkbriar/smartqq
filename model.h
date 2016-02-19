@@ -130,7 +130,7 @@ struct Font {
         name = json["name"].get<string>();
         size = json["size"].get<int>();
         int j = 0;
-        for (auto i : json["stype"].get<vector<int>>()) {
+        for (auto i : json["style"].get<vector<int>>()) {
             style[j ++] = i;
         }
     }
@@ -161,7 +161,8 @@ struct DiscussMessage {
         did = json["did"].get<int64_t>();
         uid = json["send_uin"].get<int64_t>();
         auto _content = json["content"].get<vector<nlohmann::json>>();
-        font = Font(_content.front());
+        font = Font(_content.front().
+                get<list<nlohmann::json>>().back());
         content = _content.back().get<string>();
     }
 };
@@ -279,7 +280,8 @@ struct GroupMessage {
         gid = json["group_code"].get<int64_t>();
         uid = json["send_uin"].get<int64_t>();
         auto _content = json["content"].get<list<nlohmann::json>>();
-        font = Font(_content.front());
+        font = Font(_content.front().
+                get<list<nlohmann::json>>().back());
         content = _content.back().get<string>();
     }
 };
@@ -295,7 +297,8 @@ struct Message {
         time = json["time"].get<int64_t>();
         uid = json["from_uin"].get<int64_t>();
         auto _content = json["content"].get<list<nlohmann::json>>();
-        font = Font(_content.front());
+        font = Font(_content.front().
+                get<list<nlohmann::json>>().back());
         content = _content.back().get<string>();
     }
 };

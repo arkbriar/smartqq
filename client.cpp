@@ -22,6 +22,11 @@ SmartQQClient::SmartQQClient(MessageCallback& callback)
 {
     login();
 
+    log_debug(string("ptwebqq: ").append(ptwebqq));
+    log_debug(string("vfwebqq: ").append(vfwebqq));
+    log_debug(string("uin: ").append(to_string(uin)));
+    log_debug(string("psessionid: ").append(psessionid));
+
     pollMessage(callback);
 }
 
@@ -592,11 +597,11 @@ json SmartQQClient::getResponseJson(const cpr::Response& r)
     int ret_code = ret["retcode"].get<int>();
     if(ret_code != 0) {
         if(ret_code == 103) {
-            log_err(string("Request failed. Api return code's")
+            log_err(string("Request failed. Api return code's ")
                     .append(to_string(ret_code)
                     .append(". Please check http:w.qq.com and log out.")));
         } else {
-            throw std::runtime_error(string("Request failed. Api return codes' ").append(to_string(ret_code)));
+            throw std::runtime_error(string("Request failed. Api return code's ").append(to_string(ret_code)));
         }
     }
     return ret;
@@ -611,3 +616,4 @@ json SmartQQClient::getJsonObjectResult(const cpr::Response& r)
 {
     return getResponseJson(r)["result"];
 }
+
