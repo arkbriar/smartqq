@@ -23,7 +23,9 @@ struct ApiUrl {
     }
 
     std::string getOrigin() const {
-        return url.substr(0, url.find_last_of('/'));
+        if (url.find_first_of('/') != std::string::npos)
+            return url.substr(0, url.find_first_of('/', 7));
+        else return url;
     }
 
     std::string buildUrl(const std::list<std::string>& paramList) const {

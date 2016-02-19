@@ -27,7 +27,14 @@ SmartQQClient::SmartQQClient(MessageCallback& callback)
     log_debug(string("uin: ").append(to_string(uin)));
     log_debug(string("psessionid: ").append(psessionid));
 
-    pollMessage(callback);
+    /*
+     *pollMessage(callback);
+     */
+
+    getFriendList();
+    getGroupList();
+    getDiscussList();
+    getRecentList();
 }
 
 void SmartQQClient::login()
@@ -43,6 +50,7 @@ void SmartQQClient::getQRCode()
 {
     log("Getting QRCode.");
     auto r = get(SMARTQQ_API_URL(GET_QR_CODE));
+    log_debug(r.cookies.GetEncoded());
     cookies = r.cookies;
     log_debug(cookies["qrsig"]);
     fstream out("QR.png", ios::out);
@@ -66,6 +74,13 @@ string SmartQQClient::verifyQRCode()
             log_debug(r.cookies.GetEncoded());
             log_debug(r.text);
             cookies.AddCookie(r.cookies);
+            /*
+             *cookies.DelCookie("0");
+             *cookies.DelCookie("qrsig");
+             *cookies.DelCookie("superkey");
+             *cookies.DelCookie("supertoken");
+             *cookies.DelCookie("superuin");
+             */
             for (string::size_type i = 0, j = 0; i != string::npos; i = j + 3) {
                 j = result.find("','", i);
                 string content = result.substr(i, j - i);
@@ -284,6 +299,7 @@ list<Friend> SmartQQClient::getFriendList()
     j["vfwebqq"] = vfwebqq;
     j["hash"] = hash();
 
+    log_debug(cookies.GetEncoded());
     auto r = post(SMARTQQ_API_URL(GET_FRIEND_LIST), j);
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into list
@@ -516,6 +532,7 @@ cpr::Response SmartQQClient::post(const ApiUrl& url)
 cpr::Response SmartQQClient::post(const ApiUrl& url, const json& jparam)
 {
     log_debug(string("HTTP/POST ").append(url.getUrl()));
+    log_debug(jparam.dump());
     session.SetUrl(url.getUrl());
     session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}, {"Origin", url.getOrigin()}});
     session.SetCookies(cookies);
@@ -549,6 +566,7 @@ string SmartQQClient::hash()
 string SmartQQClient::hash(int64_t x, string K)
 {
     int N[4];
+    N[0] = N[1] = N[2] = N[3] = 0;
     for (string::size_type T = 0; T < K.length(); T ++) {
         N[T & 0x3] ^= K.at(T);
     }
