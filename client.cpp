@@ -22,7 +22,7 @@ SmartQQClient::SmartQQClient(MessageCallback& callback)
 {
     login();
 
-//    pollMessage(callback);
+    pollMessage(callback);
 }
 
 void SmartQQClient::login()
