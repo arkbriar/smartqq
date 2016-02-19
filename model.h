@@ -19,6 +19,14 @@ struct Birthday {
     int year;
     int month;
     int day;
+
+    Birthday() {}
+
+    Birthday(nlohmann::json json) {
+        year = json["year"];
+        month = json["month"];
+        day = json["day"];
+    }
 };
 
 struct Friend;
@@ -28,11 +36,35 @@ struct Category {
     int sort;
     string name;
     list<Friend> friends;
+
+    Category() {}
+
+    Category(nlohmann::json json) {
+        index = json["index"];
+        sort = json["sort"];
+        name = json["name"];
+        friends = json["friends"].get<list<Friend>>();
+    }
+
+    static Category defaultCategory() {
+        Category c;
+        c.index = 0;
+        c.sort = 0;
+        c.name = "我的好友";
+        return c;
+    }
 };
 
 struct Discuss {
     int64_t id;
     string name;
+
+    Discuss() {}
+
+    Discuss(nlohmann::json json) {
+        id = json["did"].get<int64_t>();
+        name = json["name"];
+    }
 };
 
 struct DiscussUser {
@@ -49,23 +81,31 @@ struct DiscussUser {
             .append(", status='").append(status).append("'")
             .append("}");
     }
+
+    DiscussUser() {}
+
+    DiscussUser(nlohmann::json json) {
+        uin = json["uin"];
+        nick = json["nick"];
+        clientType = json["client_type"];
+        status = json["status"];
+    }
 };
 
 struct DiscussInfo {
     int64_t id;
     string name;
     list<DiscussUser> users;
+
+    DiscussInfo() {}
+
+    DiscussInfo(nlohmann::json json) {
+        id = json["did"];
+        name = json["discu_name"];
+    }
 };
 
 struct Font;
-
-struct DiscussMessage {
-    int64_t discussId;
-    int64_t time;
-    string content;
-    int64_t userId;
-    Font& font;
-};
 
 struct Font {
     static const Font DEFAULT_FONT;
@@ -84,6 +124,18 @@ struct Font {
         return font;
     }
 
+    Font() {}
+
+    Font(nlohmann::json json) {
+        color = json["color"].get<string>();
+        name = json["name"].get<string>();
+        size = json["size"].get<int>();
+        int j = 0;
+        for (auto i : json["stype"].get<vector<int>>()) {
+            style[j ++] = i;
+        }
+    }
+
     string toString() const {
         nlohmann::json _j;
         nlohmann::json j;
@@ -93,6 +145,25 @@ struct Font {
         j["size"] = size;
         _j["Font"] = j;
         return _j.dump();
+    }
+};
+
+struct DiscussMessage {
+    int64_t did;
+    int64_t time;
+    string content;
+    int64_t uid;
+    Font font;
+
+    DiscussMessage() {}
+
+    DiscussMessage(nlohmann::json json) {
+        time = json["time"].get<int64_t>();
+        did = json["did"].get<int64_t>();
+        uid = json["send_uin"].get<int64_t>();
+        auto _content = json["content"].get<list<nlohmann::json::basic_json>>();
+        font = Font(_content.front());
+        content = _content.back().get<string>();
     }
 };
 
@@ -120,6 +191,14 @@ struct FriendStatus {
     int64_t uin;
     string status;
     int clientType;
+
+    FriendStatus() {}
+
+    FriendStatus(nlohmann::json json) {
+        uin = json["uin"];
+        status = json["status"];
+        clientType = json["client_type"];
+    }
 };
 
 struct Group {
@@ -127,6 +206,15 @@ struct Group {
     string name;
     int64_t flag;
     int64_t code;
+
+    static Group parseJson(const nlohmann::json& json) {
+        Group g;
+        g.id = json["gid"].get<int64_t>();
+        g.name = json["name"].get<string>();
+        g.flag = json["flag"].get<int64_t>();
+        g.code = json["code"].get<int64_t>();
+        return g;
+    }
 };
 
 struct GroupUser {
@@ -141,6 +229,22 @@ struct GroupUser {
     int status;
     bool vip;
     int vipLevel;
+
+    GroupUser() {}
+
+    GroupUser(nlohmann::json json) {
+        nick = json["nick"];
+        province = json["province"];
+        gender = json["gender"];
+        uin = json["uin"];
+        country = json["country"];
+        city = json["city"];
+        card = json["card"];
+        clientType = json["client_type"];
+        status = json["status"];
+        vip = json["vip"];
+        vipLevel = json["vipLevel"];
+    }
 };
 
 struct GroupInfo {
@@ -151,6 +255,17 @@ struct GroupInfo {
     int64_t owner;
     string markname;
     list<GroupUser> users;
+
+    GroupInfo() {}
+
+    GroupInfo(nlohmann::json json) {
+        gid = json["gid"];
+        createtime = json["createtime"];
+        memo = json["memo"];
+        name = json["name"];
+        owner = json["owner"];
+        markname = json["markname"];
+    }
 };
 
 struct GroupMessage {
@@ -158,19 +273,47 @@ struct GroupMessage {
     int64_t time;
     string content;
     int64_t uid;
-    Font& font;
+    Font font;
+
+    GroupMessage() {}
+
+    GroupMessage(nlohmann::json json) {
+        time = json["time"].get<int64_t>();
+        gid = json["group_code"].get<int64_t>();
+        uid = json["send_uin"].get<int64_t>();
+        auto _content = json["content"].get<list<nlohmann::json::basic_json>>();
+        font = Font(_content.front());
+        content = _content.back().get<string>();
+    }
 };
 
 struct Message {
     int64_t time;
     string content;
     int64_t uid;
-    Font& font;
+    Font font;
+
+    Message() {}
+    Message(nlohmann::json json) {
+        time = json["time"].get<int64_t>();
+        uid = json["from_uin"].get<int64_t>();
+        auto _content = json["content"].get<list<nlohmann::json::basic_json>>();
+        font = Font(_content.front());
+        content = _content.back().get<string>();
+    }
 };
 
 struct Recent {
     int64_t uin;
+    // 0:Friend, 1:Group, 2:Discuss
     int type;
+
+    Recent() {}
+
+    Recent(nlohmann::json json) {
+        uin = json["uin"];
+        type = json["type"];
+    }
 };
 
 struct UserInfo {
@@ -193,6 +336,30 @@ struct UserInfo {
     string account;
     string gender;
     string mobile;
+
+    UserInfo() {}
+
+    UserInfo(nlohmann::json json) {
+        birthday = json["birthday"];
+        phone = json["phone"];
+        occupation = json["occupation"];
+        college = json["college"];
+        uin = json["uin"];
+        blood = json["blood"];
+        lnick = json["lnick"];
+        homepage = json["homepage"];
+        vipInfo = json["vip_info"];
+        city = json["city"];
+        country = json["country"];
+        province = json["province"];
+        personal = json["personal"];
+        shengxiao = json["shengxiao"];
+        nick = json["nick"];
+        email = json["email"];
+        account = json["account"];
+        gender = json["gender"];
+        mobile = json["mobile"];
+    }
 };
 
 NAMESPACE_END(smartqq)

@@ -76,7 +76,7 @@ public:
 
 private:
 
-    static map<int64_t, Friend> parseFriendMap();
+    static map<int64_t, Friend> parseFriendMap(nlohmann::json json);
 
     cpr::Response get(const ApiUrl& url);
 
@@ -99,6 +99,8 @@ private:
     void close();
 
     static nlohmann::json getResponseJson(const cpr::Response& r);
+
+    static nlohmann::json::array_t getJsonArrayResult(const cpr::Response& r);
 
     static nlohmann::json getJsonObjectResult(const cpr::Response& r);
 };

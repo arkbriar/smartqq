@@ -119,6 +119,10 @@ list<Group> SmartQQClient::getGroupList()
 
     /*@Parse JSON result into list
      * */
+    auto _groups = jres["gnamelist"].get<list<json>>();
+    for (auto i : _groups) {
+        groups.push_back(Group::parseJson(i));
+    }
     return groups;
 }
 
@@ -136,6 +140,17 @@ void SmartQQClient::pollMessage(MessageCallback &callback)
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into list
      * */
+    auto array = jres.get<vector<json>>();
+    for (auto message : array) {
+        auto type = message["poll_type"].get<string>();
+        if("message" == type) {
+            callback.onMessage(Message(message["value"]));
+        } else if("group_message" == type) {
+            callback.onGroupMessage(GroupMessage(message["value"]));
+        } else if("discu_message" == type) {
+            callback.onDiscussMessage(DiscussMessage(message["value"]));
+        }
+    }
 }
 
 void SmartQQClient::sendMessageToGroup(int64_t groupId, const string &msg)
@@ -198,7 +213,10 @@ list<Discuss> SmartQQClient::getDiscussList()
     auto jres = getJsonObjectResult(r);
     /*@Parse result into list
      * */
-
+    auto _diss = jres["dnamelist"].get<list<json>>();
+    for (auto i : _diss) {
+        discusses.push_back(i);
+    }
     return discusses;
 }
 
@@ -216,7 +234,21 @@ list<Category> SmartQQClient::getFriendListWithCategory()
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into list
      * */
+    map<int64_t, Friend> friendMap = parseFriendMap(jres);
+    auto _categs = jres["categories"].get<list<json::basic_json>>();
+    map<int64_t, Category> categoryMap;
+    categoryMap.insert({0, Category::defaultCategory()});
+    for (auto i : _categs) {
+        Category c(i);
+        categoryMap.insert({c.index, c});
+    }
 
+    auto _frids = jres["friends"].get<list<json>>();
+    for (auto i : _frids) {
+        auto f = friendMap.at(i["uin"].get<int64_t>());
+        categoryMap[i["categories"].get<int64_t>()].friends
+            .push_back(f);
+    }
     return categories;
 }
 
@@ -233,32 +265,35 @@ list<Friend> SmartQQClient::getFriendList()
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into list
      * */
-
+    for (auto i : parseFriendMap(jres)) {
+        friends.push_back(i.second);
+    }
     return friends;
 }
 
 UserInfo SmartQQClient::getAccountInfo()
 {
     log("Getting account info.");
-    UserInfo uinfo;
 
     auto r = get(SMARTQQ_API_URL(GET_ACCOUNT_INFO));
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into info
      * */
 
+    UserInfo uinfo(jres);
     return uinfo;
 }
 
 UserInfo SmartQQClient::getFriendInfo(int64_t friendId)
 {
     log("Getting friend info.");
-    UserInfo uinfo;
 
     auto r = get(SMARTQQ_API_URL(GET_FRIEND_INFO), list<string>({to_string(friendId), vfwebqq, psessionid}));
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into info
      * */
+
+    UserInfo uinfo(jres);
     return uinfo;
 }
 
@@ -277,6 +312,10 @@ list<Recent> SmartQQClient::getRecentList()
     /*@Parse JSON result into list
      * */
 
+    auto _recs = jres.get<list<json::basic_json>>();
+    for (auto i : _recs) {
+        recents.push_back(i);
+    }
     return recents;
 }
 
@@ -299,6 +338,11 @@ list<FriendStatus> SmartQQClient::getFriendStatus()
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into list
      * */
+    auto _frdstss = jres.get<list<json::basic_json>>();
+
+    for (auto i : _frdstss) {
+        fses.push_back(i);
+    }
 
     return fses;
 }
@@ -307,12 +351,41 @@ GroupInfo SmartQQClient::getGroupInfo(int64_t groupCode)
 {
     log(string("Getting group info of ").append(to_string(groupCode))
             .append("."));
-    GroupInfo ginfo;
 
     auto r = get(SMARTQQ_API_URL(GET_GROUP_INFO), list<string>({to_string(groupCode), vfwebqq}));
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into info
      * */
+    GroupInfo ginfo(jres["ginfo"]);
+
+    map<int64_t, GroupUser> groupUserMap;
+    for (auto i : jres["minfo"].get<list<json>>()) {
+        GroupUser gu(i);
+        groupUserMap.insert({gu.uin, gu});
+    }
+
+    auto stats = jres["stats"].get<list<json>>();
+    for (auto i : stats) {
+        GroupUser& gu = groupUserMap[i["uin"]];
+        gu.clientType = i["client_type"];
+        gu.status = i["stat"];
+    }
+
+    auto cards = jres["cards"].get<list<json>>();
+    for (auto i : cards) {
+        groupUserMap[i["muin"]].card = i["card"];
+    }
+
+    auto vipinfos = jres["vipinfo"].get<list<json>>();
+    for (auto i : vipinfos) {
+        GroupUser& gu = groupUserMap[i["u"]];
+        gu.vip = i["is_vip"].get<bool>();
+        gu.vipLevel = i["vip_level"];
+    }
+
+    for (auto i : groupUserMap) {
+        ginfo.users.push_back(i.second);
+    }
 
     return ginfo;
 }
@@ -321,21 +394,59 @@ DiscussInfo SmartQQClient::getDiscussInfo(int64_t discussId)
 {
     log(string("Getting group info of ").append(to_string(discussId))
             .append("."));
-    DiscussInfo dinfo;
     auto r = get(SMARTQQ_API_URL(GET_DISCUSS_INFO), list<string>({to_string(discussId), vfwebqq, psessionid}));
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into info
      * */
+    DiscussInfo dinfo(jres["info"]);
+
+    auto minfo = jres["mem_info"].get<vector<json>>();
+    map<int64_t, DiscussUser> discussUserMap;
+    for (auto i : minfo) {
+        DiscussUser du(i);
+        discussUserMap.insert({du.uin, du});
+    }
+
+    auto stats = jres["mem_status"].get<vector<json>>();
+    for (auto i : stats) {
+        DiscussUser& du = discussUserMap[i["uin"]];
+        du.clientType = i["client_type"];
+        du.status = i["status"];
+    }
+
+    for (auto i : discussUserMap) {
+        dinfo.users.push_back(i.second);
+    }
 
     return dinfo;
 }
 
-map<int64_t, Friend> SmartQQClient::parseFriendMap()
+map<int64_t, Friend> SmartQQClient::parseFriendMap(json result)
 {
     map<int64_t, Friend> friendMap;
 
     /*@TODO
      * */
+    auto info = result["info"].get<vector<json>>();
+    for (auto i : info) {
+        Friend f;
+        f.userId = i["uin"];
+        f.nickname = i["nick"];
+        friendMap.insert({f.userId, f});
+    }
+
+    auto marknames = result["marknames"].get<vector<json>>();
+    for (auto i : marknames) {
+        friendMap[i["uin"]].markname = i["markname"];
+    }
+
+    auto vipinfo = result["vipinfo"].get<vector<json>>();
+    for (auto i : vipinfo) {
+        Friend& f = friendMap[i["u"]];
+        f.vip = i["is_vip"];
+        f.vipLevel = i ["vip_level"];
+    }
+
     return friendMap;
 }
 
@@ -441,11 +552,30 @@ void SmartQQClient::close()
 
 json SmartQQClient::getResponseJson(const cpr::Response& r)
 {
-    json ret;
+    if (r.status_code != 200) {
+        throw std::runtime_error(string("Request failed. Http return code's ").append(to_string(r.status_code)));
+    }
+    json ret = json::parse(r.text);
     /*@TODO
      * */
-
+    log("Text of response is:");
+    log(ret);
+    int ret_code = ret["retcode"].get<int>();
+    if(ret_code != 0) {
+        if(ret_code == 103) {
+            log_err(string("Request failed. Api return code's")
+                    .append(to_string(ret_code)
+                    .append(". Please check http:w.qq.com and log out.")));
+        } else {
+            throw std::runtime_error(string("Request failed. Api return codes' ").append(to_string(ret_code)));
+        }
+    }
     return ret;
+}
+
+json::array_t SmartQQClient::getJsonArrayResult(const cpr::Response& r)
+{
+    return getResponseJson(r)["result"].get<json::array_t>();
 }
 
 json SmartQQClient::getJsonObjectResult(const cpr::Response& r)
