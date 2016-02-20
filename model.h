@@ -163,7 +163,15 @@ struct DiscussMessage {
         auto _content = json["content"].get<vector<nlohmann::json>>();
         font = Font(_content.front().
                 get<list<nlohmann::json>>().back());
-        content = _content.back().get<string>();
+        auto msg = _content.back();
+        if(msg.is_array()) {
+            // ["face", 10]
+            auto _face = msg.get<vector<nlohmann::json>>();
+            content = string("/").append(_face.front().get<string>())
+                .append("#")
+                .append(std::to_string(_face.back().get<int>()));
+            // "/face#10"
+        } else content = msg.get<string>();
     }
 };
 
@@ -282,7 +290,15 @@ struct GroupMessage {
         auto _content = json["content"].get<list<nlohmann::json>>();
         font = Font(_content.front().
                 get<list<nlohmann::json>>().back());
-        content = _content.back().get<string>();
+        auto msg = _content.back();
+        if(msg.is_array()) {
+            // ["face", 10]
+            auto _face = msg.get<vector<nlohmann::json>>();
+            content = string("/").append(_face.front().get<string>())
+                .append("#")
+                .append(std::to_string(_face.back().get<int>()));
+            // "/face#10"
+        } else content = msg.get<string>();
     }
 };
 
@@ -299,7 +315,15 @@ struct Message {
         auto _content = json["content"].get<list<nlohmann::json>>();
         font = Font(_content.front().
                 get<list<nlohmann::json>>().back());
-        content = _content.back().get<string>();
+        auto msg = _content.back();
+        if(msg.is_array()) {
+            // ["face", 10]
+            auto _face = msg.get<vector<nlohmann::json>>();
+            content = string("/").append(_face.front().get<string>())
+                .append("#")
+                .append(std::to_string(_face.back().get<int>()));
+            // "/face#10"
+        } else content = msg.get<string>();
     }
 };
 
