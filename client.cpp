@@ -1,7 +1,9 @@
 #include "client.h"
 
 #include <iostream>
+#include <thread>
 #include <fstream>
+#include <cstdio>
 using namespace smartqq;
 
 int64_t SmartQQClient::MESSAGE_ID = 32690001L;
@@ -14,27 +16,89 @@ const int64_t SmartQQClient::Client_ID = 53999199L;
 #endif
 
 #define log(str) std::cout << str << std::endl
-#define log_err(str) std::cerr << str << std::endl;
+#define log_err(str) std::cerr << str << std::endl
 
 using json = nlohmann::json;
+
+/*@TESTED
+ * login()
+ * getQRCode()
+ * verifyQRCode()
+ * getPtwebqq()
+ * getVfwebqq()
+ * getUinAndPsessionid()
+ * getGroupList()
+ * pollMessage()
+ * sendMessageToFriend()
+ * getDiscussList()
+ * getFriendList()
+ * getFriendListWithCategory()
+ * getRecentList()
+ */
+
+/*@NOT TESTED
+ * sendMessageToDiscuss()
+ * sendMessageToGroup()
+ * getAccountInfo()
+ * getFriendInfo()
+ * getQQById()
+ * getFriendStatus()
+ * getGroupInfo()
+ * getDiscussInfo()
+ */
 
 SmartQQClient::SmartQQClient(MessageCallback& callback)
 {
     login();
 
-    log_debug(string("ptwebqq: ").append(ptwebqq));
-    log_debug(string("vfwebqq: ").append(vfwebqq));
-    log_debug(string("uin: ").append(to_string(uin)));
-    log_debug(string("psessionid: ").append(psessionid));
+    /*
+     *log_debug(string("ptwebqq: ").append(ptwebqq));
+     *log_debug(string("vfwebqq: ").append(vfwebqq));
+     *log_debug(string("uin: ").append(to_string(uin)));
+     *log_debug(string("psessionid: ").append(psessionid));
+     */
 
     /*
      *pollMessage(callback);
      */
 
-    getFriendList();
-    getGroupList();
-    getDiscussList();
-    getRecentList();
+    //getFriendList();
+    /*
+     *getFriendListWithCategory();
+     */
+    /*
+     *sendMessageToFriend(3249607287L, "本条消息由WebQQC++ 测试发送.");
+     */
+    /*
+     *getGroupList();
+     *getDiscussList();
+     *getRecentList();
+     */
+
+    std::thread poll(&SmartQQClient::pollThread, this, std::ref(callback));
+    poll.detach();
+}
+
+void SmartQQClient::pollThread(MessageCallback& callback)
+{
+    mutex.lock();
+    pollStarted = true;
+    mutex.unlock();
+    log("Poll thread start.");
+    while(true) {
+        mutex.lock();
+        if (!pollStarted) {
+            mutex.unlock();
+            return;
+        }
+        try {
+            pollMessage(callback);
+            mutex.unlock();
+        } catch (std::runtime_error e) {
+            log_err(e.what());
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    }
 }
 
 void SmartQQClient::login()
@@ -56,6 +120,8 @@ void SmartQQClient::getQRCode()
     fstream out("QR.png", ios::out);
     out << r.text;
     out.close();
+    // execute a shell command with popen
+    popen("fish -c \"open QR.png\"", "r");
     cout << "QR Code is in file QR.png. Please open and scan.\n";
 }
 
@@ -287,6 +353,11 @@ list<Category> SmartQQClient::getFriendListWithCategory()
         categoryMap[i["categories"].get<int64_t>()].friends
             .push_back(f);
     }
+
+    for (auto c : categoryMap) {
+        categories.push_back(std::move(c.second));
+    }
+
     return categories;
 }
 
@@ -299,7 +370,6 @@ list<Friend> SmartQQClient::getFriendList()
     j["vfwebqq"] = vfwebqq;
     j["hash"] = hash();
 
-    log_debug(cookies.GetEncoded());
     auto r = post(SMARTQQ_API_URL(GET_FRIEND_LIST), j);
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into list
@@ -460,7 +530,7 @@ DiscussInfo SmartQQClient::getDiscussInfo(int64_t discussId)
     return dinfo;
 }
 
-map<int64_t, Friend> SmartQQClient::parseFriendMap(json result)
+map<int64_t, Friend> SmartQQClient::parseFriendMap(const json& result)
 {
     map<int64_t, Friend> friendMap;
 
@@ -482,8 +552,8 @@ map<int64_t, Friend> SmartQQClient::parseFriendMap(json result)
     auto vipinfo = result["vipinfo"].get<vector<json>>();
     for (auto i : vipinfo) {
         Friend& f = friendMap[i["u"]];
-        f.vip = i["is_vip"];
-        f.vipLevel = i ["vip_level"];
+        f.vip = i["is_vip"].get<int>() == 1? true: false;
+        f.vipLevel = i["vip_level"];
     }
 
     return friendMap;
@@ -544,7 +614,7 @@ cpr::Response SmartQQClient::post(const ApiUrl& url, const json& jparam)
     return session.Post();
 }
 
-void SmartQQClient::checkSendMsgResult(cpr::Response r)
+void SmartQQClient::checkSendMsgResult(const cpr::Response& r)
 {
     if (r.status_code != 200) {
         log_err(string("Send failed. Http status code's ").append(to_string(r.status_code)));
@@ -600,7 +670,9 @@ void SmartQQClient::sleep(int64_t seconds)
 
 void SmartQQClient::close()
 {
-
+    mutex.lock();
+    pollStarted = false;
+    mutex.unlock();
 }
 
 json SmartQQClient::getResponseJson(const cpr::Response& r)
@@ -633,6 +705,11 @@ json::array_t SmartQQClient::getJsonArrayResult(const cpr::Response& r)
 
 json SmartQQClient::getJsonObjectResult(const cpr::Response& r)
 {
-    return getResponseJson(r)["result"];
+    auto j = getResponseJson(r);
+    if(j.find("result") != j.end()) {
+        return j["result"];
+    } else {
+        throw runtime_error("Receive an invalid response. ERR:NO RESULT");
+    }
 }
 

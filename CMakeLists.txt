@@ -17,5 +17,5 @@ set(BUILD_CPR_TESTS OFF)
 
 add_subdirectory(cpr)
 include_directories(${CPR_INCLUDE_DIRS})
-target_link_libraries(smartqq ${CPR_LIBRARIES})
+target_link_libraries(smartqq ${CPR_LIBRARIES} pthread)
 

@@ -11,6 +11,7 @@
 #include "json.hpp"
 
 #include <map>
+#include <thread>
 
 #include <cpr/cpr.h>
 
@@ -25,8 +26,6 @@ public:
     string vfwebqq;
     int64_t uin;
     string psessionid;
-
-    bool pollStarted;
 
     SmartQQClient(MessageCallback& callback);
 
@@ -74,7 +73,9 @@ public:
 
 private:
 
-    static map<int64_t, Friend> parseFriendMap(nlohmann::json json);
+    void pollThread(MessageCallback &callback);
+
+    static map<int64_t, Friend> parseFriendMap(const nlohmann::json& json);
 
     cpr::Response get(const ApiUrl& url);
 
@@ -86,7 +87,7 @@ private:
 
     cpr::Response post(const ApiUrl& url, const nlohmann::json& jparam);
 
-    static void checkSendMsgResult(cpr::Response r);
+    static void checkSendMsgResult(const cpr::Response& r);
 
     string hash();
 
@@ -105,6 +106,10 @@ private:
     cpr::Session session;
 
     cpr::Cookies cookies;
+
+    bool pollStarted;
+
+    std::mutex mutex;
 };
 
 NAMESPACE_END(smartqq)

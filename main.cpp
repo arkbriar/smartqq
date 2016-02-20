@@ -23,5 +23,9 @@ int main(int argc, char *argv[])
 {
     _MessageCallback t;
     smartqq::SmartQQClient client(t);
+
+    while(true) {
+        std::this_thread::sleep_for(std::chrono::seconds(3600));
+    }
     return 0;
 }
