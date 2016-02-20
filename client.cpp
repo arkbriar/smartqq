@@ -93,10 +93,10 @@ void SmartQQClient::pollThread(MessageCallback& callback)
         }
         try {
             pollMessage(callback);
-            mutex.unlock();
         } catch (std::runtime_error e) {
             log_err(e.what());
         }
+        mutex.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 }
