@@ -493,7 +493,7 @@ cpr::Response SmartQQClient::get(const ApiUrl& url)
 {
     log_debug(string("HTTP/GET ").append(url.getUrl()));
     session.SetUrl(url.getUrl());
-    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
+    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}, {"Connection", "keep-alive"}});
     session.SetCookies(cookies);
 
     return session.Get();
@@ -503,7 +503,7 @@ cpr::Response SmartQQClient::get(const ApiUrl& url, const list<string>& params)
 {
     log_debug(string("HTTP/GET ").append(url.buildUrl(params)));
     session.SetUrl(url.buildUrl(params));
-    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
+    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}, {"Connection", "keep-alive"}});
     session.SetCookies(cookies);
 
     return session.Get();
@@ -513,7 +513,7 @@ cpr::Response SmartQQClient::get(const ApiUrl& url, const map<string, string>& p
 {
     log_debug(string("HTTP/GET ").append(url.getUrl()));
     session.SetUrl(url.getUrl());
-    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}});
+    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}, {"Connection", "keep-alive"}});
     session.SetCookies(cookies);
     cpr::Parameters _cpr_params;
     for (auto pair : params) {
@@ -534,10 +534,11 @@ cpr::Response SmartQQClient::post(const ApiUrl& url, const json& jparam)
     log_debug(string("HTTP/POST ").append(url.getUrl()));
     log_debug(jparam.dump());
     session.SetUrl(url.getUrl());
-    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}, {"Origin", url.getOrigin()}});
+    session.SetHeader({{"User-Agent", ApiUrl::USER_AGENT}, {"Referer", url.getReferer()}, {"Origin", url.getOrigin()}, {"Connection", "keep-alive"}, {"Content-Type", "application/x-www-form-urlencoded"}, {"Accept", "*/*"}});
     session.SetCookies(cookies);
 
     cpr::Payload _cpr_form({{"r", jparam.dump()}});
+    log_debug(_cpr_form.content);
     session.SetPayload(std::move(_cpr_form));
 
     return session.Post();

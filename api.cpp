@@ -18,7 +18,7 @@ __GET_PTWEBQQ (
     "https://ui.ptlogin2.qq.com/cgi-bin/login"
 ),
 __GET_VFWEBQQ (
-    "http://s.web2.qq.com/api/getvfwebqq?ptwebqq={##}&clientid=53999199&psessionid=&t=0.1",
+    "http://s.web2.qq.com/api/getvfwebqq?ptwebqq={##}&clientid=53999199&psessionid=&t=1455894463494",
     "http://s.web2.qq.com/proxy.html?v=20130916001&callback=1&id=1"
 ),
 __GET_UIN_AND_PSESSIONID (
