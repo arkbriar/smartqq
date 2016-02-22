@@ -627,9 +627,16 @@ void SmartQQClient::checkSendMsgResult(const cpr::Response& r)
     }
 
     json j = json::parse(r.text);
+    log_debug(j.dump());
+    if(j.find("retcode") != j.end()) {
+        int retcode = j["retcode"].get<int>();
+        if(retcode != 0) {
+            log_err(string("Send failed. Api return code's ").append(to_string(retcode)));
+        }
+    }
     int err_code = j["errCode"].get<int>();
     if (err_code == 0) {
-        log("Send succeeded.");
+        log("Send ok.");
     } else {
         log_err(string("Send failed. Api return code's ").append(to_string(err_code)));
     }

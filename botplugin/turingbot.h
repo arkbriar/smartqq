@@ -129,6 +129,7 @@ private:
                     ret.append(res_json["text"]).append("\n");
                     for (auto news : newslist) {
                         ret.append(news.dump()).append("\n");
+                        break;
                     }
 
                     return ret;
@@ -142,6 +143,7 @@ private:
                     ret.append(res_json["text"]).append("\n");
                     for (auto news : newslist) {
                         ret.append(news.dump()).append("\n");
+                        break;
                     }
 
                     return ret;
@@ -171,7 +173,7 @@ public:
             try {
                 auto reply = client.Ask(msg, idmap_.at(message.uid));
 
-                GetClient().sendMessageToFriend(message.uid, reply);
+                GetClient().sendMessageToFriend(message.uid, reply.insert(0, "Bot reply: "));
 
                 std::this_thread::sleep_for(std::chrono::seconds(2));
             } catch (TuringException e) {
