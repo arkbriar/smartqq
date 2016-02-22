@@ -633,6 +633,7 @@ void SmartQQClient::checkSendMsgResult(const cpr::Response& r)
         if(retcode != 0) {
             log_err(string("Send failed. Api return code's ").append(to_string(retcode)));
         }
+        return;
     }
     int err_code = j["errCode"].get<int>();
     if (err_code == 0) {

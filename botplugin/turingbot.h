@@ -3,6 +3,7 @@
 
 #include "../robot.h"
 #include "../json.hpp"
+#include "../utils.h"
 #include <cpr/session.h>
 
 #include <iostream>
@@ -52,7 +53,7 @@ public:
     }
 
     std::string Ask(std::string msg, std::string userid = "", std::string loc = "") {
-        if(msg.length() > 30 || userid.length() > 30 || loc.length() > 30) {
+        if(stows(msg).length() > 30 || userid.length() > 30 || loc.length() > 30) {
             throw TuringException("Some of params is too long.");
         } else if(msg == "") {
             throw TuringException("Message is empty.");
