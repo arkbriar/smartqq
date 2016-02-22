@@ -49,7 +49,9 @@ using json = nlohmann::json;
 
 SmartQQClient::SmartQQClient()
 {
-    login();
+    /*
+     *login();
+     */
 
     /*
      *log_debug(string("ptwebqq: ").append(ptwebqq));
@@ -233,6 +235,7 @@ list<Group> SmartQQClient::getGroupList()
     return groups;
 }
 
+// throw runtime_error
 void SmartQQClient::pollMessage(MessageCallback &callback)
 {
     log("Polling message.");
@@ -345,6 +348,44 @@ list<Category> SmartQQClient::getFriendListWithCategory()
     /*@Parse JSON result into list
      * */
     map<int64_t, Friend> friendMap = parseFriendMap(jres);
+    auto _categs = jres["categories"].get<list<json>>();
+    map<int64_t, Category> categoryMap;
+    categoryMap.insert({0, Category::defaultCategory()});
+    for (auto i : _categs) {
+        Category c(i);
+        categoryMap.insert({c.index, c});
+    }
+
+    auto _frids = jres["friends"].get<list<json>>();
+    for (auto i : _frids) {
+        auto f = friendMap.at(i["uin"].get<int64_t>());
+        categoryMap[i["categories"].get<int64_t>()].friends
+            .push_back(f);
+    }
+
+    for (auto c : categoryMap) {
+        categories.push_back(std::move(c.second));
+    }
+
+    return categories;
+}
+
+list<Category> SmartQQClient::getFriendListWithCategory(std::map<int64_t, Friend>& friendMap_)
+{
+    log("Getting friend list with category.");
+    list<Category> categories;
+
+    json j;
+    j["vfwebqq"] = vfwebqq;
+    j["hash"] = hash();
+
+    auto r = post(SMARTQQ_API_URL(GET_FRIEND_LIST), j);
+    auto jres = getJsonObjectResult(r);
+    /*@Parse JSON result into list
+     * */
+    friendMap_ = parseFriendMap(jres);
+    // friendMap is constant
+    auto friendMap = const_cast<std::map<int64_t, Friend>&>(friendMap_);
     auto _categs = jres["categories"].get<list<json>>();
     map<int64_t, Category> categoryMap;
     categoryMap.insert({0, Category::defaultCategory()});

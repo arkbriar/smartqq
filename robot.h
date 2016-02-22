@@ -6,6 +6,8 @@
 #include "smartqq.h"
 
 #include <vector>
+#include <list>
+#include <map>
 #include <memory>
 
 NAMESPACE_BEGIN(smartqq)
@@ -29,13 +31,21 @@ public:
 
     void AddPlugin(std::shared_ptr<RobotPlugin> plugin);
 
+    void AddPlugin(const std::list<std::shared_ptr<RobotPlugin>>& plugin_list);
+
     void Run();
 private:
+    friend class RobotPlugin;
+
     SmartQQClient& client_;
     // SuperCallback will call plugins' one by one
     SuperCallback callback_;
     std::vector<std::shared_ptr<RobotPlugin>> plugins;
-    friend class RobotPlugin;
+
+    std::list<Category> categories_;
+    std::list<Group> groups_;
+    std::list<Discuss> discusses_;
+    std::map<int64_t, Friend> friendMap_;
 };
 
 class RobotPlugin : public MessageCallback{
@@ -46,8 +56,24 @@ public:
     virtual void onGroupMessage(const GroupMessage& message) = 0;
     virtual void onDiscussMessage(const DiscussMessage& message) = 0;
 
-    SmartQQClient& GetClient() {
+    SmartQQClient& GetClient() const {
         return robot_.client_;
+    }
+
+    const std::list<Category>& GetCategories() const {
+        return robot_.categories_;
+    }
+
+    const std::list<Group>& GetGroups() const {
+        return robot_.groups_;
+    }
+
+    const std::list<Discuss>& GetDiscusses() const {
+        return robot_.discusses_;
+    }
+
+    const std::map<int64_t, Friend>& GetFriendMap() const {
+        return robot_.friendMap_;
     }
 
 protected:

@@ -41,8 +41,6 @@ public:
 
     void getUinAndPsessionid();
 
-    list<Group> getGroupList();
-
     void pollMessage(MessageCallback &callback);
 
     void sendMessageToGroup(int64_t groupId, const string& msg);
@@ -51,25 +49,29 @@ public:
 
     void sendMessageToFriend(int64_t friendId, const string& msg);
 
+    list<Group> getGroupList();
+
     list<Discuss> getDiscussList();
 
     list<Category> getFriendListWithCategory();
 
+    list<Category> getFriendListWithCategory(std::map<int64_t, Friend>& friendMap);
+
     list<Friend> getFriendList();
+
+    list<Recent> getRecentList();
 
     UserInfo getAccountInfo();
 
     UserInfo getFriendInfo(int64_t friendId);
-
-    list<Recent> getRecentList();
-
-    int64_t getQQById(int64_t friendId);
 
     list<FriendStatus> getFriendStatus();
 
     GroupInfo getGroupInfo(int64_t groupCode);
 
     DiscussInfo getDiscussInfo(int64_t discussId);
+
+    int64_t getQQById(int64_t friendId);
 
     void startPolling(MessageCallback& callback);
 

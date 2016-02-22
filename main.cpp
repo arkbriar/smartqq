@@ -8,32 +8,13 @@
 #include <memory>
 using namespace std;
 
-class PluginTest : public smartqq::RobotPlugin {
-public:
-    PluginTest(smartqq::Robot& robot) : RobotPlugin(robot) {}
-    void onMessage(const smartqq::Message& message) {
-        cout << "Message: " << message.content << endl;
-    }
-
-    void onGroupMessage(const smartqq::GroupMessage& message) {
-        cout << "Group message: " << message.content << endl;
-    }
-
-    void onDiscussMessage(const smartqq::DiscussMessage& message) {
-        cout << "Discuss message: " << message.content << endl;
-    }
-};
-
 int main(int argc, char *argv[])
 {
     smartqq::SmartQQClient c;
     smartqq::Robot r(c);
-    shared_ptr<smartqq::RobotPlugin> p(new PluginTest(r));
     shared_ptr<smartqq::RobotPlugin> d(new smartqq::BotDice(r));
     shared_ptr<smartqq::TuringBot> t(new smartqq::TuringBot(r));
-    r.AddPlugin(p);
-    r.AddPlugin(d);
-    r.AddPlugin(t);
+    r.AddPlugin({d, t});
 
     r.Run();
 
