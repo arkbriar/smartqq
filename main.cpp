@@ -1,6 +1,8 @@
 #include "smartqq.h"
 #include "client.h"
 #include "robot.h"
+#include "botplugin/dice.h"
+#include "botplugin/turingbot.h"
 
 #include <iostream>
 #include <memory>
@@ -27,7 +29,11 @@ int main(int argc, char *argv[])
     smartqq::SmartQQClient c;
     smartqq::Robot r(c);
     shared_ptr<smartqq::RobotPlugin> p(new PluginTest(r));
+    shared_ptr<smartqq::RobotPlugin> d(new smartqq::BotDice(r));
+    shared_ptr<smartqq::TuringBot> t(new smartqq::TuringBot(r));
     r.AddPlugin(p);
+    r.AddPlugin(d);
+    r.AddPlugin(t);
 
     r.Run();
 

@@ -10,19 +10,7 @@
 
 NAMESPACE_BEGIN(smartqq)
 
-class Robot;
-
-class RobotPlugin : public MessageCallback{
-public:
-    RobotPlugin(Robot& robot) : robot_(robot) {};
-
-    virtual void onMessage(const Message& message) = 0;
-    virtual void onGroupMessage(const GroupMessage& message) = 0;
-    virtual void onDiscussMessage(const DiscussMessage& message) = 0;
-
-private:
-    Robot& robot_;
-};
+class RobotPlugin;
 
 class SuperCallback : public MessageCallback {
 public:
@@ -48,6 +36,22 @@ private:
     SuperCallback callback_;
     std::vector<std::shared_ptr<RobotPlugin>> plugins;
     friend class RobotPlugin;
+};
+
+class RobotPlugin : public MessageCallback{
+public:
+    RobotPlugin(Robot& robot) : robot_(robot) {};
+
+    virtual void onMessage(const Message& message) = 0;
+    virtual void onGroupMessage(const GroupMessage& message) = 0;
+    virtual void onDiscussMessage(const DiscussMessage& message) = 0;
+
+    SmartQQClient& GetClient() {
+        return robot_.client_;
+    }
+
+protected:
+    Robot& robot_;
 };
 
 NAMESPACE_END(smartqq)

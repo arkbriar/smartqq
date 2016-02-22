@@ -264,6 +264,7 @@ void SmartQQClient::sendMessageToGroup(int64_t groupId, const string &msg)
 {
     log(string("Sending message to group ").append(to_string(groupId))
             .append("."));
+    log(msg);
 
     json j;
     j["group_uin"] = groupId;
@@ -281,6 +282,7 @@ void SmartQQClient::sendMessageToDiscuss(int discussId, const string& msg)
 {
     log(string("Sending message to discuss ").append(to_string(discussId))
             .append("."));
+    log(msg);
 
     json j;
     j["did"] = discussId;
@@ -298,6 +300,7 @@ void SmartQQClient::sendMessageToFriend(int64_t friendId, const string& msg)
 {
     log(string("Sending message to friend ").append(to_string(friendId))
             .append("."));
+    log(msg);
 
     json j;
     j["to"] = friendId;
