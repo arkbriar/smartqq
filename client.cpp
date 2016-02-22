@@ -47,7 +47,7 @@ using json = nlohmann::json;
  * getDiscussInfo()
  */
 
-SmartQQClient::SmartQQClient(MessageCallback& callback)
+SmartQQClient::SmartQQClient()
 {
     login();
 
@@ -74,7 +74,10 @@ SmartQQClient::SmartQQClient(MessageCallback& callback)
      *getDiscussList();
      *getRecentList();
      */
+}
 
+void SmartQQClient::startPolling(MessageCallback& callback)
+{
     std::thread poll(&SmartQQClient::pollThread, this, std::ref(callback));
     poll.detach();
 }
@@ -683,8 +686,8 @@ json SmartQQClient::getResponseJson(const cpr::Response& r)
     json ret = json::parse(r.text);
     /*@TODO
      * */
-    log("Text of response is:");
-    log(ret);
+    log_debug("Text of response is:");
+    log_debug(ret);
     int ret_code = ret["retcode"].get<int>();
     if(ret_code != 0) {
         if(ret_code == 103) {

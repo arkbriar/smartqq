@@ -10,9 +10,9 @@ class MessageCallback {
 protected:
     MessageCallback() {}
 public:
-    virtual void onMessage(Message message) = 0;
-    virtual void onGroupMessage(GroupMessage message) = 0;
-    virtual void onDiscussMessage(DiscussMessage message) = 0;
+    virtual void onMessage(const Message& message) = 0;
+    virtual void onGroupMessage(const GroupMessage& message) = 0;
+    virtual void onDiscussMessage(const DiscussMessage& message) = 0;
 };
 
 NAMESPACE_END(smartqq)

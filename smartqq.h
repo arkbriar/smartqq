@@ -4,6 +4,6 @@
 #define NAMESPACE_BEGIN(ns) namespace ns {
 #define NAMESPACE_END(ns) }
 
-#define SMARTQQ_DEBUG
+//#define SMARTQQ_DEBUG
 
 #endif

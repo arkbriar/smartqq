@@ -27,7 +27,7 @@ public:
     int64_t uin;
     string psessionid;
 
-    SmartQQClient(MessageCallback& callback);
+    SmartQQClient();
 
     void login();
 
@@ -70,6 +70,8 @@ public:
     GroupInfo getGroupInfo(int64_t groupCode);
 
     DiscussInfo getDiscussInfo(int64_t discussId);
+
+    void startPolling(MessageCallback& callback);
 
 private:
 

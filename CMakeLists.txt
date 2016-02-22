@@ -5,8 +5,11 @@ cmake_minimum_required (VERSION 2.6)
 project (smartqq)
 
 # add the executable
-add_executable (smartqq main.cpp client.cpp api.cpp model.cpp)
+add_executable (smartqq main.cpp client.cpp api.cpp model.cpp robot.cpp)
+
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -std=c++11")
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -DSMARTQQ_DEBUG")
+set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS}")
 
 find_package(CURL)
 if(CURL_FOUND)
