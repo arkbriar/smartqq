@@ -1,4 +1,4 @@
-#include "api.h"
+#include "api.hpp"
 
 NAMESPACE_BEGIN(smartqq)
 

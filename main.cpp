@@ -1,8 +1,8 @@
-#include "smartqq.h"
-#include "client.h"
-#include "robot.h"
-#include "botplugin/dice.h"
-#include "botplugin/turingbot.h"
+#include "smartqq.hpp"
+#include "client.hpp"
+#include "robot.hpp"
+#include "botplugin/dice.hpp"
+#include "botplugin/turingbot.hpp"
 
 #include <iostream>
 #include <memory>

@@ -1,8 +1,8 @@
 #ifndef __SMARTQQ_CALLBACK_H__
 #define __SMARTQQ_CALLBACK_H__
 
-#include "model.h"
-#include "smartqq.h"
+#include "model.hpp"
+#include "smartqq.hpp"
 
 NAMESPACE_BEGIN(smartqq)
 

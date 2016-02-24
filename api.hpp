@@ -4,7 +4,7 @@
 #include <string>
 #include <list>
 
-#include "smartqq.h"
+#include "smartqq.hpp"
 
 NAMESPACE_BEGIN(smartqq)
 

@@ -1,10 +1,10 @@
 #ifndef __SMARTQQ_CLIENT_H__
 #define __SMARTQQ_CLIENT_H__
 
-#include "smartqq.h"
-#include "model.h"
-#include "callback.h"
-#include "api.h"
+#include "smartqq.hpp"
+#include "model.hpp"
+#include "callback.hpp"
+#include "api.hpp"
 
 /* Use JSON library from https://github.com/hlohmann/json
  * Convenient copy 2016.02.18*/

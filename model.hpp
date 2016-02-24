@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "smartqq.h"
+#include "smartqq.hpp"
 
 #include "json.hpp"
 

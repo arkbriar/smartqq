@@ -1,9 +1,9 @@
 #ifndef __SMARTQQ_ROBOT_H__
 #define __SMARTQQ_ROBOT_H__
 
-#include "client.h"
-#include "callback.h"
-#include "smartqq.h"
+#include "client.hpp"
+#include "callback.hpp"
+#include "smartqq.hpp"
 
 #include <vector>
 #include <list>
