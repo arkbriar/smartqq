@@ -6,7 +6,7 @@ Smart QQ C++
 DEPENDENCY
 ----------------
 
-1\. [CPR](https://github.com/whoshuu/cpr) (LICENSE MIT)
+1\. [CPR](https://github.com/whoshuu/cpr) (LICENSE MIT) (Slightly modified)
 
 2\. [JSON for Modern C++](https://github.com/nlohmann/json) (LICENSE MIT)
 
@@ -31,6 +31,8 @@ BUILD
 ----------------
 
 可以通过以下方式在linux上编译测试
+
+> git submodule update --init --recursive
 
 > mkdir build
 
