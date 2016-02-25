@@ -37,6 +37,8 @@ public:
 
     void getPtwebqq(const string& url);
 
+    void cgiReport();
+
     void getVfwebqq();
 
     void getUinAndPsessionid();

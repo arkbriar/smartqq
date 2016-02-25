@@ -111,6 +111,7 @@ void SmartQQClient::login()
     getQRCode();
     string url = verifyQRCode();
     getPtwebqq(url);
+    cgiReport();
     getVfwebqq();
     getUinAndPsessionid();
 }
@@ -179,6 +180,14 @@ void SmartQQClient::getPtwebqq(const string& url)
     log_debug(r.cookies.GetEncoded());
     /* Get ptwebqq from cookies */
     ptwebqq = cookies["ptwebqq"];
+}
+
+void SmartQQClient::cgiReport()
+{
+    log("Reporting to cgi.");
+    auto r = get(SMARTQQ_API_URL(CGI_REPORT));
+
+    log_debug(r.status_code);
 }
 
 void SmartQQClient::getVfwebqq()

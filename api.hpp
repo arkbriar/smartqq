@@ -44,6 +44,7 @@ private:
 extern const ApiUrl
 __GET_QR_CODE,
 __VERIFY_QR_CODE,
+__CGI_REPORT,
 __GET_PTWEBQQ,
 __GET_VFWEBQQ,
 __GET_UIN_AND_PSESSIONID,
