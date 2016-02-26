@@ -83,10 +83,20 @@ public:
     void UpdateGroupList() const {
 
         robot_.groups_ = robot_.client_.getGroupList();
+
+        for (auto& i : robot_.groups_) {
+            i.ginfo = robot_.client_.getGroupInfo(i.code);
+        }
+
     }
 
     void UpdateDiscussList() const {
         robot_.discusses_ = robot_.client_.getDiscussList();
+
+        for (auto& i : robot_.discusses_) {
+            i.dinfo = robot_.client_.getDiscussInfo(i.id);
+        }
+
     }
 
 protected:

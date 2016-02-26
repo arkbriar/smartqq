@@ -54,45 +54,28 @@ struct Category {
     }
 };
 
-struct Discuss {
-    int64_t id;
-    string name;
-
-    Discuss() {}
-
-    Discuss(nlohmann::json json) {
-        id = json["did"].get<int64_t>();
-        name = json["name"];
-    }
-};
-
 struct DiscussUser {
     int64_t uin;
     string nick;
     int clientType;
     string status;
 
-    string toString() const {
-        string ret = "DiscussUser{";
-        return ret.append("uin=").append(to_string(uin))
-            .append(", nick='").append(nick).append("'")
-            .append(", cliendType='").append(to_string(clientType)).append("'")
-            .append(", status='").append(status).append("'")
-            .append("}");
-    }
-
     DiscussUser() {}
 
     DiscussUser(nlohmann::json json) {
         uin = json["uin"];
         nick = json["nick"];
-        clientType = json["client_type"];
-        status = json["status"];
+        /*
+         *clientType = json["client_type"];
+         *status = json["status"];
+         */
     }
 };
 
 struct DiscussInfo {
+    //@did
     int64_t id;
+    //@discu_name
     string name;
     list<DiscussUser> users;
 
@@ -101,6 +84,20 @@ struct DiscussInfo {
     DiscussInfo(nlohmann::json json) {
         id = json["did"];
         name = json["discu_name"];
+    }
+};
+
+struct Discuss {
+    int64_t id;
+    string name;
+
+    DiscussInfo dinfo;
+
+    Discuss() {}
+
+    Discuss(nlohmann::json json) {
+        id = json["did"].get<int64_t>();
+        name = json["name"];
     }
 };
 
@@ -207,22 +204,6 @@ struct FriendStatus {
     }
 };
 
-struct Group {
-    int64_t id;
-    string name;
-    int64_t flag;
-    int64_t code;
-
-    static Group parseJson(const nlohmann::json& json) {
-        Group g;
-        g.id = json["gid"].get<int64_t>();
-        g.name = json["name"].get<string>();
-        g.flag = json["flag"].get<int64_t>();
-        g.code = json["code"].get<int64_t>();
-        return g;
-    }
-};
-
 struct GroupUser {
     string nick;
     string province;
@@ -245,11 +226,13 @@ struct GroupUser {
         uin = json["uin"];
         country = json["country"];
         city = json["city"];
-        card = json["card"];
-        clientType = json["client_type"];
-        status = json["status"];
-        vip = json["vip"];
-        vipLevel = json["vipLevel"];
+        /*
+         *card = json["card"];
+         *clientType = json["client_type"];
+         *status = json["status"];
+         *vip = json["vip"];
+         *vipLevel = json["vipLevel"];
+         */
     }
 };
 
@@ -270,7 +253,24 @@ struct GroupInfo {
         memo = json["memo"];
         name = json["name"];
         owner = json["owner"];
-        markname = json["markname"];
+    }
+};
+
+struct Group {
+    int64_t id;
+    string name;
+    int64_t flag;
+    int64_t code;
+
+    GroupInfo ginfo;
+
+    static Group parseJson(const nlohmann::json& json) {
+        Group g;
+        g.id = json["gid"].get<int64_t>();
+        g.name = json["name"].get<string>();
+        g.flag = json["flag"].get<int64_t>();
+        g.code = json["code"].get<int64_t>();
+        return g;
     }
 };
 

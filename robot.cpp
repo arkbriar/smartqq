@@ -18,9 +18,15 @@ public:
 
     void onGroupMessage(const GroupMessage& message) {
         std::string groupname;
+        std::string username = std::to_string(message.uid);
         for (auto i : GetGroups()) {
             if (i.id == message.gid) {
                 groupname = i.name;
+                for (auto j : i.ginfo.users) {
+                    if (j.uin == message.uid) {
+                        username = j.card.empty()?j.card:j.nick;
+                    }
+                }
                 break;
             }
         }
@@ -30,21 +36,32 @@ public:
             for (auto i : GetGroups()) {
                 if (i.id == message.gid) {
                     groupname = i.name;
+                    for (auto j : i.ginfo.users) {
+                        if (j.uin == message.uid) {
+                            username = j.card.empty()?j.card:j.nick;
+                        }
+                    }
                     break;
                 }
             }
         }
-        if (groupname.empty()) groupname = "NotFound";
-        cout << "Group message from user " << std::to_string(message.uid)
+        if (groupname.empty()) groupname = "NOTFOUND";
+        cout << "Group message from user " << username
             << " in group " << groupname
             << ": " << message.content << endl;
     }
 
     void onDiscussMessage(const smartqq::DiscussMessage& message) {
         std::string discussname;
+        std::string username = std::to_string(message.uid);
         for (auto i : GetDiscusses()) {
             if (i.id == message.did) {
                 discussname = i.name;
+                for (auto j : i.dinfo.users) {
+                    if(j.uin == message.uid) {
+                        username = j.nick;
+                    }
+                }
                 break;
             }
         }
@@ -54,12 +71,17 @@ public:
             for (auto i : GetDiscusses()) {
                 if (i.id == message.did) {
                     discussname = i.name;
+                    for (auto j : i.dinfo.users) {
+                        if(j.uin == message.uid) {
+                            username = j.nick;
+                        }
+                    }
                     break;
                 }
             }
         }
-        if(discussname.empty()) discussname = "NotFound";
-        cout << "Discuss message from user " << std::to_string(message.uid)
+        if (discussname.empty()) discussname = "NOTFOUND";
+        cout << "Discuss message from user " << username
             << "in discuss " << discussname
             << ": " << message.content << endl;
     }
@@ -110,7 +132,16 @@ void Robot::Run()
 
     categories_ = client_.getFriendListWithCategory(friendMap_);
     groups_ = client_.getGroupList();
+
+    for (auto& i : groups_) {
+        i.ginfo = client_.getGroupInfo(i.code);
+    }
+
     discusses_ = client_.getDiscussList();
+
+    for (auto& i : discusses_) {
+        i.dinfo = client_.getDiscussInfo(i.id);
+    }
 
     client_.startPolling(callback_);
 }

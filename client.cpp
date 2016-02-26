@@ -39,6 +39,8 @@ using json = nlohmann::json;
  * getFriendList()
  * getFriendListWithCategory()
  * getRecentList()
+ * getGroupInfo()
+ * getDiscussInfo()
  */
 
 /*@NOT TESTED
@@ -48,8 +50,6 @@ using json = nlohmann::json;
  * getFriendInfo()
  * getQQById()
  * getFriendStatus()
- * getGroupInfo()
- * getDiscussInfo()
  */
 
 SmartQQClient::SmartQQClient()
@@ -213,7 +213,7 @@ void SmartQQClient::getVfwebqq()
 
 void SmartQQClient::afterVfwebqq()
 {
-    log("Reporting to cgi.");
+    log("Something after getting vfwebqq.");
     auto r = get(SMARTQQ_API_URL(WSPEED_CGI));
 
     log_debug(r.status_code);
@@ -528,7 +528,7 @@ list<FriendStatus> SmartQQClient::getFriendStatus()
 
 GroupInfo SmartQQClient::getGroupInfo(int64_t groupCode)
 {
-    log(string("Getting group info of ").append(to_string(groupCode))
+    log_debug(string("Getting group info of ").append(to_string(groupCode))
             .append("."));
 
     auto r = get(SMARTQQ_API_URL(GET_GROUP_INFO), list<string>({to_string(groupCode), vfwebqq}));
@@ -550,15 +550,17 @@ GroupInfo SmartQQClient::getGroupInfo(int64_t groupCode)
         gu.status = i["stat"];
     }
 
-    auto cards = jres["cards"].get<list<json>>();
-    for (auto i : cards) {
-        groupUserMap[i["muin"]].card = i["card"];
+    if (jres.find("cards") != jres.end()) {
+        auto cards = jres["cards"].get<list<json>>();
+        for (auto i : cards) {
+            groupUserMap[i["muin"]].card = i["card"];
+        }
     }
 
     auto vipinfos = jres["vipinfo"].get<list<json>>();
     for (auto i : vipinfos) {
         GroupUser& gu = groupUserMap[i["u"]];
-        gu.vip = i["is_vip"].get<bool>();
+        gu.vip = i["is_vip"].get<int>() == 1;
         gu.vipLevel = i["vip_level"];
     }
 
@@ -571,7 +573,7 @@ GroupInfo SmartQQClient::getGroupInfo(int64_t groupCode)
 
 DiscussInfo SmartQQClient::getDiscussInfo(int64_t discussId)
 {
-    log(string("Getting group info of ").append(to_string(discussId))
+    log_debug(string("Getting group info of ").append(to_string(discussId))
             .append("."));
     auto r = get(SMARTQQ_API_URL(GET_DISCUSS_INFO), list<string>({to_string(discussId), vfwebqq, psessionid}));
     auto jres = getJsonObjectResult(r);
@@ -622,7 +624,7 @@ map<int64_t, Friend> SmartQQClient::parseFriendMap(const json& result)
     auto vipinfo = result["vipinfo"].get<vector<json>>();
     for (auto i : vipinfo) {
         Friend& f = friendMap[i["u"]];
-        f.vip = i["is_vip"].get<int>() == 1? true: false;
+        f.vip = i["is_vip"].get<int>() == 1;
         f.vipLevel = i["vip_level"];
     }
 
