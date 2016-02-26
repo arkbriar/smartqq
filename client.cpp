@@ -113,6 +113,7 @@ void SmartQQClient::login()
     getPtwebqq(url);
     cgiReport();
     getVfwebqq();
+    afterVfwebqq();
     getUinAndPsessionid();
 }
 
@@ -203,6 +204,14 @@ void SmartQQClient::getVfwebqq()
     /* Get vfwebqq */
     vfwebqq = getJsonObjectResult(r)["vfwebqq"];
     log_debug(vfwebqq);
+}
+
+void SmartQQClient::afterVfwebqq()
+{
+    log("Reporting to cgi.");
+    auto r = get(SMARTQQ_API_URL(WSPEED_CGI));
+
+    log_debug(r.status_code);
 }
 
 void SmartQQClient::getUinAndPsessionid()

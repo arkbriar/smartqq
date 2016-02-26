@@ -41,6 +41,8 @@ public:
 
     void getVfwebqq();
 
+    void afterVfwebqq();
+
     void getUinAndPsessionid();
 
     void pollMessage(MessageCallback &callback);

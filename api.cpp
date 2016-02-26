@@ -17,6 +17,10 @@ __CGI_REPORT (
     "http://cgi.connect.qq.com/report/report?strValue=0&nValue=11202&tag=0&qver=0.0.1&t=1456405680750",
     "http://w.qq.com"
 ),
+__WSPEED_CGI (
+    "http://wspeed.qq.com/w.cgi?appid=1000164&touin=null&releaseversion=SMARTQQ&frequency=1&commandid=http%3A%2F%2Fs.web2.qq.com%2Fapi%2Fgetvfwebqq&resultcode=0&tmcost=549",
+    "http://w.qq.com/"
+),
 __GET_PTWEBQQ (
     "{##}",
     "https://ui.ptlogin2.qq.com/cgi-bin/login"
