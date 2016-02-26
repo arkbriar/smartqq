@@ -6,6 +6,10 @@ class CommonChat : public RobotPlugin {
 public:
     CommonChat(smartqq::Robot& robot) : RobotPlugin(robot) {}
     void onMessage(const Message& message) {
+        //Deal with new friend
+        if (GetFriendMap().find(message.uid) == GetFriendMap().end()) {
+            UpdateFriendList();
+        }
         std::string name = GetFriendMap().at(message.uid).markname;
         if(name == "") name = GetFriendMap().at(message.uid).nickname;
         cout << "Message from " << name << ": "
@@ -20,6 +24,17 @@ public:
                 break;
             }
         }
+        if (groupname.empty()) {
+            UpdateGroupList();
+
+            for (auto i : GetGroups()) {
+                if (i.id == message.gid) {
+                    groupname = i.name;
+                    break;
+                }
+            }
+        }
+        if (groupname.empty()) groupname = "NotFound";
         cout << "Group message from user " << std::to_string(message.uid)
             << " in group " << groupname
             << ": " << message.content << endl;
@@ -33,6 +48,17 @@ public:
                 break;
             }
         }
+        if (discussname.empty()) {
+            UpdateDiscussList();
+
+            for (auto i : GetDiscusses()) {
+                if (i.id == message.did) {
+                    discussname = i.name;
+                    break;
+                }
+            }
+        }
+        if(discussname.empty()) discussname = "NotFound";
         cout << "Discuss message from user " << std::to_string(message.uid)
             << "in discuss " << discussname
             << ": " << message.content << endl;

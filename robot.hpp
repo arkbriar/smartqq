@@ -76,6 +76,19 @@ public:
         return robot_.friendMap_;
     }
 
+    void UpdateFriendList() const {
+        robot_.categories_ = robot_.client_.getFriendListWithCategory(robot_.friendMap_);
+    }
+
+    void UpdateGroupList() const {
+
+        robot_.groups_ = robot_.client_.getGroupList();
+    }
+
+    void UpdateDiscussList() const {
+        robot_.discusses_ = robot_.client_.getDiscussList();
+    }
+
 protected:
     Robot& robot_;
 };
