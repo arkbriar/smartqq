@@ -9,7 +9,7 @@
 
 #include "smartqq.hpp"
 
-#include "json.hpp"
+#include <json.hpp>
 
 NAMESPACE_BEGIN(smartqq)
 

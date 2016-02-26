@@ -1,9 +1,9 @@
 #ifndef __BOTPLUGIN_TURINGBOT_H__
 #define __BOTPLUGIN_TURINGBOT_H__
 
-#include "../robot.hpp"
-#include "../json.hpp"
-#include "../utils.hpp"
+#include "../include/robot.hpp"
+#include <json.hpp>
+#include "../include/utils.hpp"
 #include <cpr/session.h>
 
 #include <iostream>

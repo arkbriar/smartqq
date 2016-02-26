@@ -18,6 +18,10 @@ endif()
 
 set(BUILD_CPR_TESTS OFF)
 
+set (SMARTQQ_INCLUDE_DIRS "include")
+set (JSON_INCLUDE_DIR "json")
+include_directories(${SMARTQQ_INCLUDE_DIRS} ${JSON_INCLUDE_DIR})
+
 add_subdirectory(cpr)
 include_directories(${CPR_INCLUDE_DIRS})
 target_link_libraries(smartqq ${CPR_LIBRARIES} pthread)

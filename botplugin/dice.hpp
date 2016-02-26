@@ -1,7 +1,7 @@
 #ifndef __BOTPLUGIN_DICE_H__
 #define __BOTPLUGIN_DICE_H__
 
-#include "../robot.hpp"
+#include "../include/robot.hpp"
 
 #include <iostream>
 #include <string>

@@ -8,7 +8,7 @@
 
 /* Use JSON library from https://github.com/hlohmann/json
  * Convenient copy 2016.02.18*/
-#include "json.hpp"
+#include <json.hpp>
 
 #include <map>
 #include <thread>
