@@ -24,7 +24,7 @@ public:
                 groupname = i.name;
                 for (auto j : i.ginfo.users) {
                     if (j.uin == message.uid) {
-                        username = j.card.empty()?j.card:j.nick;
+                        username = j.card.empty()?j.nick:j.card;
                     }
                 }
                 break;
@@ -38,7 +38,7 @@ public:
                     groupname = i.name;
                     for (auto j : i.ginfo.users) {
                         if (j.uin == message.uid) {
-                            username = j.card.empty()?j.card:j.nick;
+                            username = j.card.empty()?j.nick:j.card;
                         }
                     }
                     break;

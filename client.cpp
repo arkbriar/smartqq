@@ -52,36 +52,7 @@ using json = nlohmann::json;
  * getFriendStatus()
  */
 
-SmartQQClient::SmartQQClient()
-{
-    /*
-     *login();
-     */
-
-    /*
-     *log_debug(string("ptwebqq: ").append(ptwebqq));
-     *log_debug(string("vfwebqq: ").append(vfwebqq));
-     *log_debug(string("uin: ").append(to_string(uin)));
-     *log_debug(string("psessionid: ").append(psessionid));
-     */
-
-    /*
-     *pollMessage(callback);
-     */
-
-    //getFriendList();
-    /*
-     *getFriendListWithCategory();
-     */
-    /*
-     *sendMessageToFriend(3249607287L, "本条消息由WebQQC++ 测试发送.");
-     */
-    /*
-     *getGroupList();
-     *getDiscussList();
-     *getRecentList();
-     */
-}
+SmartQQClient::SmartQQClient() {}
 
 void SmartQQClient::startPolling(MessageCallback& callback)
 {
