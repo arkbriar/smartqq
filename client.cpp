@@ -16,7 +16,12 @@ const int64_t SmartQQClient::Client_ID = 53999199L;
 #endif
 
 #define log(str) std::cout << str << std::endl
+
+#ifdef SMARTQQ_DEBUG
+#define log_err(str) std::cout << str << std::endl
+#else
 #define log_err(str) std::cerr << str << std::endl
+#endif
 
 using json = nlohmann::json;
 
@@ -99,7 +104,7 @@ void SmartQQClient::pollThread(MessageCallback& callback)
         try {
             pollMessage(callback);
         } catch (std::runtime_error e) {
-            log_err(e.what());
+            log_debug(e.what());
         }
         mutex.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
@@ -256,7 +261,7 @@ list<Group> SmartQQClient::getGroupList()
 // throw runtime_error
 void SmartQQClient::pollMessage(MessageCallback &callback)
 {
-    log("Polling message.");
+    log_debug("Polling message.");
 
     json j;
     j["ptwebqq"] = ptwebqq;
