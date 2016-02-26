@@ -82,7 +82,7 @@ public:
         }
         if (discussname.empty()) discussname = "NOTFOUND";
         cout << "Discuss message from user " << username
-            << "in discuss " << discussname
+            << " in discuss " << discussname
             << ": " << message.content << endl;
     }
 };
