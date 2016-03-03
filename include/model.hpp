@@ -345,11 +345,11 @@ struct UserInfo {
     string phone;
     string occupation;
     string college;
-    string uin;
+    int64_t uin;
     int blood;
     string lnick;
     string homepage;
-    int vipInfo;
+    bool vipInfo;
     string city;
     string country;
     string province;
@@ -357,7 +357,7 @@ struct UserInfo {
     int shengxiao;
     string nick;
     string email;
-    string account;
+    int64_t account;
     string gender;
     string mobile;
 
@@ -372,7 +372,7 @@ struct UserInfo {
         blood = json["blood"];
         lnick = json["lnick"];
         homepage = json["homepage"];
-        vipInfo = json["vip_info"];
+        vipInfo = json["vip_info"].get<int>() == 1?true:false;
         city = json["city"];
         country = json["country"];
         province = json["province"];

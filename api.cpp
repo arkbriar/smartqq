@@ -14,7 +14,7 @@ __VERIFY_QR_CODE (
     "https://ui.ptlogin2.qq.com/cgi-bin/login"
 ),
 __CGI_REPORT (
-    "http://cgi.connect.qq.com/report/report?strValue=0&nValue=11202&tag=0&qver=0.0.1&t=1456405680750",
+    "http://cgi.connect.qq.com/report/report?strValue=0&nValue=11202&tag=0&qver=0.0.1&t={##}",
     "http://w.qq.com"
 ),
 __WSPEED_CGI (
@@ -26,7 +26,7 @@ __GET_PTWEBQQ (
     "https://ui.ptlogin2.qq.com/cgi-bin/login"
 ),
 __GET_VFWEBQQ (
-    "http://s.web2.qq.com/api/getvfwebqq?ptwebqq={##}&clientid=53999199&psessionid=&t=1455894463494",
+    "http://s.web2.qq.com/api/getvfwebqq?ptwebqq={##}&clientid=53999199&psessionid=&t={##}",
     "http://s.web2.qq.com/proxy.html?v=20130916001&callback=1&id=1"
 ),
 __GET_UIN_AND_PSESSIONID (
@@ -62,7 +62,7 @@ __SEND_MESSAGE_TO_DISCUSS (
     "http://d1.web2.qq.com/proxy.html?v=20151105001&callback=1&id=2"
 ),
 __GET_ACCOUNT_INFO (
-    "http://s.web2.qq.com/api/get_self_info2?t=0.1",
+    "http://s.web2.qq.com/api/get_self_info2?t={##}",
     "http://s.web2.qq.com/proxy.html?v=20130916001&callback=1&id=1"
 ),
 __GET_RECENT_LIST (

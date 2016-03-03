@@ -4,6 +4,7 @@
 #include <thread>
 #include <fstream>
 #include <cstdio>
+#include <ctime>
 using namespace smartqq;
 
 int64_t SmartQQClient::MESSAGE_ID = 32690001L;
@@ -41,12 +42,12 @@ using json = nlohmann::json;
  * getRecentList()
  * getGroupInfo()
  * getDiscussInfo()
+ * getAccountInfo()
  */
 
 /*@NOT TESTED
  * sendMessageToDiscuss()
  * sendMessageToGroup()
- * getAccountInfo()
  * getFriendInfo()
  * getQQById()
  * getFriendStatus()
@@ -91,6 +92,8 @@ void SmartQQClient::login()
     getVfwebqq();
     afterVfwebqq();
     getUinAndPsessionid();
+
+    getAccountInfo();
 }
 
 void SmartQQClient::getQRCode()
@@ -162,7 +165,9 @@ void SmartQQClient::getPtwebqq(const string& url)
 void SmartQQClient::cgiReport()
 {
     log("Reporting to cgi.");
-    auto r = get(SMARTQQ_API_URL(CGI_REPORT));
+    list<string> params;
+    params.push_back(std::to_string((int64_t)time(nullptr)).append("821"));
+    auto r = get(SMARTQQ_API_URL(CGI_REPORT), params);
 
     log_debug(r.status_code);
 }
@@ -173,6 +178,7 @@ void SmartQQClient::getVfwebqq()
 
     list<string> params;
     params.push_back(ptwebqq);
+    params.push_back(std::to_string((int64_t)std::time(nullptr)).append("172"));
     auto r = get(SMARTQQ_API_URL(GET_VFWEBQQ), params);
     cookies.AddCookie(r.cookies);
     log_debug(r.status_code);
@@ -185,8 +191,8 @@ void SmartQQClient::getVfwebqq()
 void SmartQQClient::afterVfwebqq()
 {
     log("Something after getting vfwebqq.");
-    auto r = get(SMARTQQ_API_URL(WSPEED_CGI));
 
+    auto r = get(SMARTQQ_API_URL(WSPEED_CGI));
     log_debug(r.status_code);
 }
 
@@ -425,7 +431,9 @@ UserInfo SmartQQClient::getAccountInfo()
 {
     log("Getting account info.");
 
-    auto r = get(SMARTQQ_API_URL(GET_ACCOUNT_INFO));
+    list<string> params;
+    params.push_back(std::to_string((int64_t)std::time(nullptr)).append("012"));
+    auto r = get(SMARTQQ_API_URL(GET_ACCOUNT_INFO), params);
     auto jres = getJsonObjectResult(r);
     /*@Parse JSON result into info
      * */
