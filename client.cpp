@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cstdio>
 #include <ctime>
+#include <stdexcept>
 using namespace smartqq;
 
 int64_t SmartQQClient::MESSAGE_ID = 32690001L;
@@ -76,6 +77,8 @@ void SmartQQClient::pollThread(MessageCallback& callback)
         try {
             pollMessage(callback);
         } catch (std::runtime_error e) {
+            log_debug(e.what());
+        } catch (const std::invalid_argument& e) {
             log_debug(e.what());
         }
         mutex.unlock();

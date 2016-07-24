@@ -7,7 +7,7 @@ project (smartqq)
 # add the executable
 add_executable (smartqq main.cpp client.cpp api.cpp model.cpp robot.cpp utils.cpp)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -std=c++11")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -std=c++11 -stdlib=libc++")
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -DSMARTQQ_DEBUG")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS}")
 
